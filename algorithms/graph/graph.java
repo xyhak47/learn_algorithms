@@ -112,7 +112,119 @@ public class DepthFirstPaths
 
 
 // 使用广度优先搜索查找图中的路径
+public class BreadthFirstPaths
+{
+	private boolean[] marked;  // 到达该定点的最短路径已知吗？
+	private int[] edgeTo;		// 到达该定点的已知路径上最后一个顶点
+	private final int s;		// 起点
+
+	public BreadthFirstPaths(Graph G, int s)
+	{
+		marked = new boolean[G.V()];
+		edgeTo = new int[G.V()];
+		this.s = s;
+		bfs(G, s);
+	}
+
+	private void bfs(Graph G, int s)
+	{
+		Queue<Integer> queue = new Queue<Integer>();
+		marked[s] = true;			// 标记起点
+		queue.enqueue(s);			// 将它加入队列
+		while(!queue.isEmpty())
+		{
+			int v = queue.dequeue(); // 从队列中删去下一个顶点
+			for(int w : G.adj(v))
+				if(!marked[w])			// 对每个未被标记的相邻顶点
+				{
+					edgeTo[w] = v;		// 保存最短路径的最后一条边
+					marked[w] = true;	// 标记它，因为最短路径已知
+					queue.enqueue(w);	// 并将它添加到队列中
+				}
+		}
+	}
+
+	// 和深度优先搜索一样
+	public boolean hasPathTo(int v)
+	{ return marked[v]; }
+
+	// 和深度优先搜索一样
+	public Iterable<Integer> pathTo(int v)
+	{
+		if(!hasPathTo(v)) return null;
+		Stack<Integer> path = new Stack<Integer>();
+		for(int x = v; x != s; x = edgeTo[x])
+			path.push(x);
+		path.push(s);
+		return path;
+	}
+}
 
 
 
+// 使用深度优先搜索找出图中的所有连通分量
+public class CC
+{
+	private boolean[] marked;
+	private int[] id;
+	private int count;
 
+	public CC(Graph G)
+	{
+		marked = new boolean[G.V()];
+		id = new int[G.V()];
+		for(int s = 0; s < G.V(); s++)
+			if(!marked[s])
+			{
+				dfs(G, s)
+				count++;
+			}
+	}
+
+	private void dfs(Graph G, int v)
+	{
+		marked[v] = true;
+		id[v] = count;
+		for(int w : G.adj(v))
+			if(!marked[w])
+				dfs(G, w);
+	}
+			
+	public boolean connected(int v, int w)
+	{ return id[v] == id[w]; }
+
+	public int id(int v)
+	{ return id[v]; }
+
+	public int count()
+	{ return count; }	
+}
+
+
+
+// G是无环图吗？（假设不存在自环或平行边）
+public class Cycle
+{
+	private boolean[] marked;
+	private boolean hasCycle;
+
+	public Cycle(Graph G)
+	{
+		marked = new boolean[G.V()];
+		for(int s = 0; s < G.V(); s++)
+			if(!marked[s])
+				dfs(G, s, s);
+	}
+
+	private void dfs(Graph G, int v, int u)
+	{
+		marked[v] = true;
+		for(int w : G.adj(v))
+			if(!marked[w])
+				dfs(G, w, v);
+			else if(w != u) hasCycle = true;    // dfs遍历到 已经标记的节点 （除父节点外的， u是w的父节点 ） 就是环
+	}
+
+	public boolean hasCycle()
+	{ return hasCycle; }
+}
