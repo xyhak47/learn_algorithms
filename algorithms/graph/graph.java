@@ -111,7 +111,7 @@ public class DepthFirstPaths
 
 
 
-// 使用广度优先搜索查找图中的路径
+// 使用广度优先搜索查找图中的路径(单点最短路径)
 public class BreadthFirstPaths
 {
 	private boolean[] marked;  // 到达该定点的最短路径已知吗？
@@ -228,3 +228,117 @@ public class Cycle
 	public boolean hasCycle()
 	{ return hasCycle; }
 }
+
+
+
+// G是二分图吗？(双色问题)
+public class TwoColor
+{
+	private	boolean[] marked;
+	private boolean[] color;
+	private boolean isTwoColorable = true;
+	public TwoColor(Graph G)
+	{
+		marked = new boolean[G.V()];
+		color = new boolean[G.V()];
+		for(int s = 0; s < G.V(); s++)
+			if(!marked[s])
+				dfs(G, s);
+	}
+
+	private void dfs(Graph G, int v)
+	{
+		marked[v] = true;
+		for(int w : G.adj(v))
+			if(!marked[w])
+			{
+				color[w] = !color[v];
+				dfs(G, w);
+			}
+			else if (color[w] == color[v]) isTwoColorable = false; //子父节点颜色一致
+	}
+
+	public boolean isBipartite()
+	{ return isTwoColorable; }
+}
+
+
+
+// 符号图的数据类型
+public class SymbolGraph
+{
+	private ST<String, Integer> st;			// 符号名 -> 索引
+	private String[] keys;					// 索引 -> 符号表
+	private Graph G;						// 图
+
+	public SymbolGraph(String stream, String sp)
+	{
+		st = new ST<String, Integer>();
+		In in = new In(stream);				// 第一遍
+		while (in.hasNextLine())			// 构造索引
+		{
+			String[] a = in.readLine().split(sp);	// 读取字符串
+
+			for(int i = 0; i < a.length; i++)		// 为每个不同的字符串关联一个索引
+				if(!st.contains(a[i]))
+					st.put(a[i], st.size());
+		}
+
+		keys = new String[st.size()];  			// 用来获得顶点名的反向索引是一个数组
+
+		for(String name : st.keys())
+			keys[st.get(name)] = name;
+
+		G = new Graph(st.size());
+		in = new In(stream);				// 第二遍
+		while(in.hasNextLine())				// 构造图
+		{
+			String[] a = Integer.readLine().split(sp);  // 将每一行的第一个顶点和该行的其他顶点相连
+			int v = st.get(a[0]);
+			for(int i = 1; i < a.length; i ++)
+				g.addEdge(v, st.get(a[i]));
+		}
+	}
+
+	public boolean contains(String s) { return st.contains(s); }
+	public int index(String s)		  { return st.get(s); }
+	public String name(int v)		  { return keys[v]; }
+	public Graph G();				  { return G; }
+}
+
+
+
+// 间隔的度数
+public class DegreesOfSeparation
+{
+	public static void main(String[] args)
+	{
+		SymbolGraph sg = new SymbolGraph(args[0], args[1]);
+
+		Graph G = sg.G();
+
+		String source = args[2];
+		if(!sg.contains(source))
+		{ StdOut.println(source + "not in database."); return; }
+
+		int s = sg.index(source);
+		BreadthFirstPaths bfs = new BreadthFirstPaths(G, s);
+
+		while(!StdIn.isEmpty())
+		{
+			String sink = StdIn.readLine();
+			if(sg.contains(sink))
+			{
+				int t = sg.index(sink);
+				if(bfs.hasPathTo(t))
+					for(int v : bfs.pathTo(t))
+						StdOut.println("___" + sg.name(v));
+				else StdOut.println("Not connected");
+			}
+			else StdOut.println("Not in database.");
+		}
+	}
+}
+
+
+
