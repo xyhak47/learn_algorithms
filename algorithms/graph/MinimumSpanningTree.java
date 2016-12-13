@@ -53,7 +53,7 @@ public class EdgeWeightedGraph
 	public EdgeWeightedGraph(In in) {} 
 
 	public int V() { return V; }
-	public itn E() { return E; }
+	public int E() { return E; }
 
 	public void	addEdge(Edge e)
 	{
@@ -76,3 +76,41 @@ public class EdgeWeightedGraph
 		return b;
 	}
 }
+
+
+
+// 最小生成树的Prim算法的延时实现
+public class LazyPrimMST
+{
+	private boolean[] marked;			// 最小生成树的顶点
+	private Queue<Edge> mst;			// 最小生成树的边
+	private MinPQ<Edge> pq;				// 横切边（包括失效的边）
+
+	public LazyPrimMST(EdgeWeightedGraph G)
+	{
+		pq = new MinPQ<Edge>();
+		marked = new boolean[G.V()];
+		mst = new Queue<Edge>();
+
+		visit(G, 0);
+		while(!pq.isEmpty())
+		{
+			Edge e = pq.delMin();
+		}
+
+
+
+
+
+	}
+
+	private void visit(EdgeWeightedGraph G)
+	{ // 标记顶点v并将所有连接v和违背标记顶点的边加入pq
+		marked[v] = true;
+		for(Edge e : G.adj(v))
+
+	}
+}
+
+
+
