@@ -120,3 +120,99 @@ public class LazyPrimMST
 
 
 
+// 最小生成树的Prim算法（即时版本）
+public class PrimMST
+{
+	private Edge[] edgeTo;			// 距离树最近的边
+	private double[] distTo;			// distTo[w]=edgeTo[w].weight()
+	private boolean[] marked;		// 如果v在树中则为true
+	private IndexMin<Double> pq;	// 有效的横切边
+
+	public PrimMST(EdgeWeightedGraph G)
+	{
+		edgeTo = new Edge[G.V()];
+		distTo = new double[G.V()];
+		marked = new boolean[G.V()];
+		for(int v = 0; v < G.V(); v++)
+			distTo[v] = Double.POSITIVE_INFINITY;		// 无穷
+		pq = new IndexMin<Double>(G.V());
+
+		distTo[0] = 0.0;
+		pq.insert(0, 0.0);				// 用顶点0和权重0初始化pq
+		while(!pq.isEmpty())
+			visit(G, pq.delMin());		// 将最近的顶点添加到树中
+	}
+
+	private void visit(EdgeWeightedGraph G, int v)
+	{ // 将顶点v添加到树中，更新数据
+		marked[v] = true;
+		for(Edge e : G.adj(v))
+		{
+			int w = e.other(v);
+
+			if(marked[w]) continue;		// v-w 失败
+			if(e.weight() < distTo[w])
+			{	// 连接w和树的最佳边Edge变为e
+				edgeTo[w] = e;
+
+				distTo[w] = e.weight();
+				if(pq.contains(w)) pq.change(w, distTo[w]);
+				else 				pq.insert(w, distTo[w]);
+			}
+		}
+	}
+
+	public Iterable<Edge> edges()
+	{
+		Bag<Edge> mst = new Bag<Edge>();
+		for(int v = 1; v < edgeTo.length; v++)
+			mst.addEdge(edgeTo[v]);
+		return mst;
+	}
+
+	public double weight() {}
+}
+
+
+
+
+// 最小生成树的Kruskal算法(从一片有V棵单顶点的树构成的森林开始并不断将两颗树合并（用可以找到的最短边）
+// 直到只剩下一棵树，它就是最小生成树)
+public class KruskalMST
+{
+	private Queue<Edge> mst;
+
+	public KruskalMST(EdgeWeightedGraph G)
+	{
+		mst = new Queue<Edge>();
+		MinPQ<Edge> pq = new MinPQ<Edge>();
+
+		for(Edge e : G.edges()) pq.insert(e);
+
+		UF uf = new UF(G.V());
+
+		while(!pq.isEmpty() && mst.size() < G.V()-1)
+		{
+			Edge e = pq.delMin();				// 从pq得到权重最小的边和它的顶点
+			int v = e.either(), w = e.other(v);
+			if(uf.connected(v, w)) continue; 	// 忽略失效的边
+
+			uf.union(v, w);					// 合并分量
+			mst.enqueue(e);					// 将边添加到最小生成树中
+		}
+	}
+
+	public Iterable<Edge> edges()
+	{ return mst; }
+
+	public double weight() {}
+}
+
+
+
+
+
+
+
+
+
