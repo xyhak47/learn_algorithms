@@ -88,28 +88,34 @@ public class LazyPrimMST
 
 	public LazyPrimMST(EdgeWeightedGraph G)
 	{
-		pq = new MinPQ<Edge>();
+		pq = new MinPQ<Edge>(); 		// 优先队列
 		marked = new boolean[G.V()];
 		mst = new Queue<Edge>();
 
 		visit(G, 0);
 		while(!pq.isEmpty())
 		{
-			Edge e = pq.delMin();
+			Edge e = pq.delMin();			// 从pq中得到权重最小的边
+
+			int v = e.either(), w = e.other(v);		
+			if(marked[v] && marked[w]) continue;	// 跳过失效的边
+			mst.enqueue(e);							// 将边加入到数中
+			if(!marked[v]) visit(G, v);				//将顶点（v或w）添加到树中
+			if(!marked[w]) visit(G, w);
 		}
-
-
-
-
-
 	}
 
-	private void visit(EdgeWeightedGraph G)
-	{ // 标记顶点v并将所有连接v和违背标记顶点的边加入pq
+	private void visit(EdgeWeightedGraph G, int v)
+	{ // 标记顶点v并将所有连接v和未被标记顶点的边加入pq
 		marked[v] = true;
 		for(Edge e : G.adj(v))
-
+			if(!marked[either.other(v)]) pq.insert(e);
 	}
+
+	public Iterable<Edge> edges()
+	{ return mst; }
+
+	public double weight() {}
 }
 
 
