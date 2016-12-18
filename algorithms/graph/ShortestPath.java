@@ -121,3 +121,83 @@ public class DijkstraSP
 		return path;
 	}
 }
+
+
+
+// 任意顶点对之间的最短路径
+public class DijkstraAllPairsSP
+{
+	private DijkstraSP[] all;
+
+	DijkstraAllPairsSP(EdgeWeightedDigraph G)
+	{
+		all = new DijkstraSP[G.V()];
+		for(int v = 0; v < G.V(); v++)
+			all[v] = new DijkstraSP(G, v);
+	}
+
+	Iterable<DirectedEdge> path(int s, int t)
+	{ return all[s].pathTo(t); }
+
+	double dist(int s, int t)
+	{ return all[s].distTo(t); }
+}
+
+
+
+
+// 无环加权有向图的最短路径算法(在拓扑排序后，构造函数会扫描整幅图并将每条边放松一次。
+// 在已知加权图是无环的情况下它是找出最短路径的最好方法)
+public class AcycliSP
+{
+	private DirectedEdge[] edgeTo;
+	private double[] distTo;
+
+	public AcycliSP(EdgeWeightedDigraph G, itn s)
+	{
+		edgeTo = new DirectedEdge[G.V()];
+		distTo = new double[G.V()];
+
+		for(int v = 0; v < G.V(); v++)
+			distTo[v] = Double.POSITIVE_INFINITY;
+		distTo[0] = 0.0;
+
+		Topological top = new Topological(G);
+		for(int v : top.order())
+			relax(G, v);
+	}
+
+	private void relax(EdgeWeightedDigraph G, int v)
+	{
+		for(DirectedEdge e : adj(v))
+		{
+			int w = e.to();
+			if(distTo[w] > distTo[v] + e.weight())
+			{
+				distTo[w] = distTo[v] + e.weight();
+				edgeTo[w] = e;
+			}
+		}
+	}
+
+	// 最短路径树实现中的标准查询算法
+	public double distTo(int v)		
+	{ return distTo[v]; }
+
+	public boolean hasPathTo(int v)
+	{ return distTo[v] != Double.POSITIVE_INFINITY; } 
+
+	public Iterable<DirectedEdge> pathTo(int v)
+	{
+		if(!hasPathTo(v)) return null;
+		Stack<DirectedEdge> path = new Stack<DirectedEdge>();
+		for(DirectedEdge e = edgeTo[v]; e != null; e = edgeTo[e.from()])
+			path.push(e);
+		return path;
+	}
+}
+
+
+
+
+
