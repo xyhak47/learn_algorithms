@@ -1,5 +1,5 @@
 
-// 带权重的变的数据类型
+// 带权重的边的数据类型
 public class Edge implements Comparable<Edge>
 {
 	private final int v;			// 顶点之一
