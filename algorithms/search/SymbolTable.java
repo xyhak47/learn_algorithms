@@ -1,4 +1,26 @@
 
+// 默认实现
+void delete(Key key) 		{ put(key, null); }
+boolean contains(Key key) 	{ return get(key) != null; }
+boolean isEmpty() 			{ return size() == 0; }
+
+
+// 有序符号表中冗余有序性方法的默认实现
+void deleteMin() { delete(min()); }
+void deleteMax() { delete(max()); }
+
+int size(Key lo, Key hi)
+{
+	if(hi.compareTo(lo) < 0)  return 0;
+	else if (contains(hi)) 	   return rank(hi) - rank(lo) + 1;
+	else					return rank(hi) - rank(lo);
+}
+
+Iterable<Key> keys() { return keys(min(), max()); }
+
+
+
+
 
 // 符号表的用例
 public class FrequencyCounter
@@ -88,46 +110,61 @@ public class BinarySearchST<Key extends Comparable<Key>, Value>
 	{
 		if(isEmpty()) return null;
 		int i = rank(key);
-		if()
+
+		if(i < N && keys[i].compareTo(key) == 0)  return vals[i];
+		else 									  return null;
 	}
 
-	private boolean isEmpty()
-	{ return N == 0; }
-
+	// 小于key的键的数量
 	public int rank(Key key)
 	{
-		
+		int lo = 0, hi = N-1;
+		while(lo <= hi)
+		{
+			int mid = lo + (hi - lo) / 2;
+			int cmp = key.compareTo(keys[mid]);
+			if 			(cmp < 0) hi = mid - 1;
+			else if 	(cmp > 0) lo = mid + 1;
+			else return mid;
+		}
+		return lo;
+	}
+
+	public void put(Key key, Value val)
+	{	// 查找键，找到则更新值，否则创建新的元素
+		int i = rank(key);
+
+		if(i < N && keys[i].compareTo(key) == 0)
+		{ vals[i] = val; return; }
+
+		for(int j = N; j > i; j--)
+		{
+			keys[j] = keys[j-1];
+			vals[j] = vals[j-1];
+		}
+
+		keys[i] = key;
+		vals[i] = val;
+		N++;
+	}
+
+	public Key min() 				{ return keys[0]; }
+	public Key max() 				{ return keys[N-1]; }
+	public Key select(int k) 		{ return keys[k]; }
+
+	// 大于等于key的最小键
+	public Key ceiling(Key key) 	{ int i = rank(key); return keys[i]; }
+	// 小于等于键的最大键
+	public Key floor(Key key) 		{}
+	public Key delete(Key key) 		{}
+
+	public Iterable<Key> keys(Key lo, Key hi)
+	{
+		Queue<Key> q = new Queue<Key>();
+		for(int i = rank(lo); i < rank(hi); i++)
+			q.enqueue(keys[i]);
+		if(contains(hi))
+			q.enqueue(keys[rank(hi)]);
+		return q;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
