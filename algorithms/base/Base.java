@@ -113,10 +113,126 @@ public class ResizingArrayStack<Item> implements Iterable<Item>
 
 
 
+// 下压堆栈（链表实现）
+public class Stack<Item> implements Iterable<Item>
+{
+	private Node first;	// 栈顶（最近添加的元素）
+	private int N;		// 元素数量
+
+	private class Node
+	{	// 定义了结点的嵌套类
+		Item item;
+		Node next;
+	}
+
+	public boolean isEmpty()	
+	{ return first == null; }	// 或：N == 0;
+
+	public int size()			
+	{ return N; }
+
+	public void push(Item item)
+	{	// 向栈顶添加元素
+		Node oldfirst = first;
+		first = new Node();
+		first.Item = item;
+		first.next = oldfirst;
+		N++;
+	}
+
+	public Item pop()
+	{	// 从栈顶删除元素
+		Item item = first.item;
+		first = first.next;
+		N--;
+		return item;
+	}
+}
 
 
 
+// 先进先出队列
+public class Queue<Item> implements Iterable<Item>
+{
+	private Node first;		// 指向最早添加的结点的链接
+	private Node last;		// 指向最近添加的结点的链接
+	private int N;			// 队列中的元素数量
 
+	private class Node
+	{	// 定义了结点的嵌套类
+		Item item;
+		Node next;
+	}
+
+	public boolean isEmpty()
+	{ return first == null; }	// 或：N == 0;
+
+	public int size()
+	{ return N; }
+
+	public void enqueue(Item item)
+	{	// 向表尾添加元素
+		Node oldlast = last;
+		last = new Node();
+		last.item = item;
+		last.next = null;
+		if(isEmpty())	first = last;
+		else			oldlast.next = last;
+		N++;
+	}
+
+	public Item dequeue()
+	{	// 从表头删除元素
+		Item item = first.item;
+		first = first.next;
+		if(isEmpty())	last = null;
+		N--;
+		return item;
+	}
+}
+
+
+
+// 背包（顺序并不重要）
+import java.util.Iterator;
+public class Bag<Item> implements Iterable<Item>
+{
+	private Node first;		// 链表的首结点
+
+	private class Node
+	{
+		Item item;
+		Node next;
+	}
+
+	public void add(Item item)
+	{	// 和Stack的push()方法完全相同
+		Node oldfirst = first;
+		first = new Node();
+		first.item = item;
+		first.next = oldfirst;
+	}
+
+	public Iterator<Item> Iterator()
+	{ return new ListIterator(); }
+
+	private class ListIterator implements Iterator<Item>
+	{
+		private Node current = first;
+
+		public boolean hasNext()
+		{ return current != null; }
+
+		public void remove() {}
+
+		public Item next()
+		{
+			Item item = current.item;
+			current = current.next;
+			return item;
+		}
+	}
+}
 
 
 
