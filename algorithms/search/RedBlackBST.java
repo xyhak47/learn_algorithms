@@ -30,7 +30,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value>
 		return x.color == RED;
 	}
 
-	Node rotateLeft(Node h)
+	private Node rotateLeft(Node h)
 	{
 		Node x = h.right;
 		h.right = x.left;
@@ -45,7 +45,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value>
 		return x;
 	}
 
-	Node rotateRight(Node h)
+	private Node rotateRight(Node h)
 	{
 		Node x = h.left;
 		h.right = x.left;
@@ -58,6 +58,76 @@ public class RedBlackBST<Key extends Comparable<Key>, Value>
 		h.N = 1 + size(h.left) + size(h.right);
 
 		return x;
+	}
+
+	private void flipColors(Node h)
+	{
+		h.color = RED;
+		h.left.color = BLACK;
+		h.right.color = BLACK;
+	}
+
+	public int size()
+	{ return size(root); }
+
+	private int size(Node x)
+	{
+		if(x == null)	return 0;
+		else			return x.N;
+	}
+
+	public void put(Key key, Value val)
+	{	// 查找key，找到则更新其值，否则为它新建一个结点
+		root = put(root, key, val);
+		root.color = BLACK;
+	}
+
+	private void put(Node h, Key key, Value val)
+	{
+		if(h == null)	// 标准的插入操作，和父结点用红链接相连
+			return new Node(key, val, 1, RED);
+
+		if cmp = key.compareTo(h.key);
+		if 		(cmp < 0)	h.left = put(h.left, key, val);
+		else if (cmp > 0)	h.right = put(h.right, key, val);
+		else	h.val = val;
+
+		if(isRed(h.right) && !isRed(h.left))	h = rotateLeft(h);
+		if(isRed(h.left) && isRed(h.left.left))	h = rotateRight(h);
+		if(isRed(h.left) && isRed(h.right))		h = flipColors(h);
+
+		h.N = size(h.left) + size(h.right) + 1;
+		return N;
+	}
+
+	private Node moveRedLeft(Node h)
+	{	// 假设结点h为红色，h.left和h.left.left都为黑色
+		// 将h.left或则h.left的子结点之一变红
+		flipColors(h);
+		if(isRed(h.right.left))
+		{
+			h.right = rotateRight(h.right);
+			h.rotateLeft(h);
+		}
+		return h;
+	}
+
+	public void deleteMin()
+	{
+		if(!isRed(root.left) && !isRed(root.root))
+			root.color = RED;
+		root.deleteMin(root);
+		if(!isEmpty())	root.color = BLACK;
+	}
+
+	private Node deleteMin(Node h)
+	{
+		if(h.left == null)
+			return null;
+		if(!isRed(h.left) && !isRed(h.left.left))
+			h = moveRedLeft(h);
+		h.left = deleteMin(h.left);
+		return balance(h);
 	}
 }
 
