@@ -96,7 +96,7 @@ public class DepthFirstPaths
 	}
 
 	public boolean hasPathTo(int v)
-	{ return marked[V]; }
+	{ return marked[v]; }
 
 	public Iterable<Integer> pathTo(int v)
 	{

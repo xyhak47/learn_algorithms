@@ -49,7 +49,7 @@ public class EdgeWeightedDigraph
 
 	public int V() { return V; }
 	public int E() { return E; }
-	public void addEde(DirectedEdge e)
+	public void addEdge(DirectedEdge e)
 	{
 		adj[e.from()].add(e);
 		E++;
@@ -62,8 +62,14 @@ public class EdgeWeightedDigraph
 	{
 		Bag<DirectedEdge> bag = new Bag<DirectedEdge>();
 		for(int v = 0; v < V; v++)
-			bag.add(e);
-		return bag;
+		{
+			for (DirectedEdge e : adj(v)) 
+			{
+                bag.add(e);
+            }	
+		}
+	
+        return bag;
 	}
 }
 
